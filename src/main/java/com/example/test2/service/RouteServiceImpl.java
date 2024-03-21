@@ -18,35 +18,36 @@ import java.util.Scanner;
 @Service
 public class RouteServiceImpl implements RouteService {
 
-    Logger log = LoggerFactory.getLogger(RouteService.class);
+    Logger log = LoggerFactory.getLogger(RouteServiceImpl.class);
 
     private final Map<Integer, LinkedHashSet<Integer>> routes = new HashMap<>();
 
     @Override
     public boolean hasRoute(Integer from, Integer to) {
 
-        final List<Integer> routeCandidates = new ArrayList<>();
+        final List<Integer> directRouteCandidates = new ArrayList<>();
 
         for (int i = 0; i < routes.size(); i++) {
-            if (routes.get(i).contains(from) && routes.get(i).contains(to))
-                routeCandidates.add(i);
+            boolean routeHasFromAndTo = routes.get(i).contains(from) && routes.get(i).contains(to);
+            if (routeHasFromAndTo)
+                directRouteCandidates.add(i);
         }
-        for (Integer r: routeCandidates) {
-            if (hasRoute(r, from, to)) return true;
+        for (Integer route: directRouteCandidates) {
+            if (routeIsDirect(route, from, to)) return true;
         }
 
         return false;
     }
 
-    private boolean hasRoute(Integer r, Integer from, Integer to) {
+    private boolean routeIsDirect(Integer route, Integer from, Integer to) {
         boolean routeCandidate = false;
-        for (Integer i : routes.get(r)) {
-            if (i.equals(from)) {
+        for (Integer stop : routes.get(route)) {
+            if (stop.equals(from)) {
                 routeCandidate = true;
                 continue;
             }
-            if (i.equals(to) && !routeCandidate) return false;
-            if (i.equals(to)) return true;
+            if (stop.equals(to) && !routeCandidate) return false;
+            if (stop.equals(to)) return true;
         }
         return false;
     }
